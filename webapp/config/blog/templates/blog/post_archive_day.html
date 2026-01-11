@@ -1,0 +1,9 @@
+<ul>
+  {% for date in dates %}
+    <li>
+      <a href="{% url 'blog:post_archive_year' date.year %}">
+        {{ date.year }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>

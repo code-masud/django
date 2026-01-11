@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock title %}
+
+{% block meta %}
+  <!-- SEO -->
+  <meta name="description" content="{{ post.meta_description }}">
+  {% if post.meta_keywords %}
+  <meta name="keywords" content="{{ post.meta_keywords }}">
+  {% endif %}
+
+  <!-- Canonical -->
+  <link rel="canonical" href="{{ post.canonical_url }}">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="{{ post.og_title }}">
+  <meta property="og:description" content="{{ post.og_description }}">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="{{ post.canonical_url }}">
+{% endblock meta %}
+
+{% block content %}
+<h4><small>POST DETAIL</small></h4>
+<hr>
+<h2><a href="{% url "blog:post-detail" category_slug=post.category.slug post_slug=post.slug %}">{{ post.title }}</a></h2>
+<h5><span class="glyphicon glyphicon-time"></span> Post by {{ post.author.username }}, {{ post.created_at|date:"M d, Y" }}.</h5>
+<h5><span class="label label-success"><a href="{% url "blog:category-detail" post.category.slug %}">{{ post.category.name }}</a></span></h5><br>
+<p>{{ post.content|linebreaks }}</p>
+<hr>
+<h4>Leave a Comment:</h4>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>{{ message.tags }}!</strong> {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+<form role="form" method="POST" action="{% url "blog:comment" post.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Send</button>
+</form>
+<br><br>
+<p><span class="badge">{{ post.comments.count }}</span> Comments:</p><br>
+
+<div class="row">
+    <div class="col-sm-10">
+        {% for comment in post.comments.all %}
+            <h4>{{ comment.name }} <small> {{ comment.created_at|date:"M d, Y H:i:s A"}}</small></h4>
+            <p>{{ comment.text }}</p>
+            <br>
+            {% empty %}
+            <p>No comment yet</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,11 @@
+<h1>Posts from {{ year }}</h1>
+
+{% for post in object_list %}
+  <h3>
+    <a href="{% url 'blog:post-detail' category_slug=post.category.slug post_slug=post.slug %}">
+      {{ post.title }}
+    </a>
+  </h3>
+{% empty %}
+  <p>No posts found.</p>
+{% endfor %}

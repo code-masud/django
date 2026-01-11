@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <title>{% block title %}{% endblock title %}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {% block meta %}
+  <!-- Default SEO -->
+  <meta name="description" content="My professional blog">
+  {% endblock meta %}
+
+  <style rel="stylesheet" src="{% static "css/style.css" %}"></style>
+  <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+  <script src="{% static "js/jquery.min.js" %}"></script>
+  <script src="{% static "js/bootstrap.min.js" %}"></script>
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row content">
+    <div class="col-sm-3 sidenav">
+      <h4>My Blog</h4>
+      <ul class="nav nav-pills nav-stacked">
+        <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><a href="/">Home</a></li>
+        {% for category in nav_categories %}
+        <li class="{% if request.resolver_match.kwargs.category_slug == category.slug %}active{% endif %}"><a href="{% url "blog:category-detail" category.slug %}">{{ category.name }}</a></li>
+        {% endfor %}
+        <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><a href="/contact/">Contact</a></li>
+        {% for date in archive_years %}
+          <li>
+            <a class="dropdown-item"
+              href="{% url 'blog:post_archive_year' date %}">
+              Archive {{ date }}
+            </a>
+          </li>
+        {% endfor %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+            Archive
+          </a>
+          <ul class="dropdown-menu">
+
+          </ul>
+        </li>
+      </ul><br>
+      <div class="input-group">
+        <form method="get" action="{% url 'blog:post-search' %}" class="d-flex">
+          <div class="row">
+            <div class="col-md-9">
+              <input
+                type="search"
+                name="q"
+                class="form-control me-2"
+                placeholder="Search posts..."
+                value="{{ request.GET.q }}"
+                required
+              >
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-default" type="submit">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-sm-9">
+      {% block content %}{% endblock content %}
+    </div>
+  </div>
+</div>
+
+<hr>
+<footer class="container-fluid text-center">
+  <a href="/">Home</a>&nbsp;&nbsp;
+  {% for category in nav_categories %}
+  <a href="{% url "blog:category-detail" category.slug %}">{{ category.name }}</a>&nbsp;&nbsp;
+  {% endfor %}
+  <a href="/contact/">Contact</a>&nbsp;&nbsp;
+  <br><br>
+  <p>Footer Text @2026</p>
+</footer>
+<hr>
+
+</body>
+</html>
