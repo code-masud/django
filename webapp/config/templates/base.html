@@ -23,28 +23,53 @@
     <div class="col-sm-3 sidenav">
       <h4>My Blog</h4>
       <ul class="nav nav-pills nav-stacked">
-        <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}"><a href="/">Home</a></li>
+
+        <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+          <a href="/">Home</a>
+        </li>
+
         {% for category in nav_categories %}
-        <li class="{% if request.resolver_match.kwargs.category_slug == category.slug %}active{% endif %}"><a href="{% url "blog:category-detail" category.slug %}">{{ category.name }}</a></li>
-        {% endfor %}
-        <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}"><a href="/contact/">Contact</a></li>
-        {% for date in archive_years %}
-          <li>
-            <a class="dropdown-item"
-              href="{% url 'blog:post_archive_year' date %}">
-              Archive {{ date }}
+          <li class="{% if request.resolver_match.kwargs.category_slug == category.slug %}active{% endif %}">
+            <a href="{% url 'blog:category-detail' category.slug %}">
+              {{ category.name }}
             </a>
           </li>
         {% endfor %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-            Archive
-          </a>
-          <ul class="dropdown-menu">
 
+        <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
+          <a href="/contact/">Contact</a>
+        </li>
+
+        <!-- ARCHIVE DROPDOWN -->
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            Archive <span class="caret"></span>
+          </a>
+
+          <ul class="dropdown-menu">
+            {% for y in archive_menu %}
+              <li class="dropdown-submenu">
+                <a href="{% url 'blog:post_archive_year' y.year %}">
+                  {{ y.year }}
+                </a>
+
+                <ul class="dropdown-menu">
+                  {% for m in y.months %}
+                    <li>
+                      <a href="{% url 'blog:post_archive_month' y.year m.month|date:'m' %}">
+                        {{ m.month|date:"F" }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endfor %}
           </ul>
         </li>
-      </ul><br>
+
+      </ul>
+
+      <br>
       <div class="input-group">
         <form method="get" action="{% url 'blog:post-search' %}" class="d-flex">
           <div class="row">

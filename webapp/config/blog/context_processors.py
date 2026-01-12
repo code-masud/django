@@ -5,17 +5,37 @@ def category_processors(request):
         'nav_categories': Category.objects.filter(published=True, featured=True)
     }
 
-from collections import defaultdict
+from django.db.models.functions import TruncYear, TruncMonth
+from django.db.models import Count
 from .models import Post
 
-def archive_context(request):
-    archives = defaultdict(list)
+def archive_menu(request):
+    years = (
+        Post.objects
+        .filter(status=Post.Status.PUBLISHED)
+        .annotate(year=TruncYear("published_at"))
+        .values("year")
+        .annotate(total=Count("id"))
+        .order_by("-year")
+    )
 
-    dates = Post.objects.filter(
-        status=Post.Status.PUBLISHED
-    ).dates('published_at', 'month', order='DESC')
+    archive = []
+    for y in years:
+        months = (
+            Post.objects
+            .filter(
+                published_at__year=y["year"].year,
+                status=Post.Status.PUBLISHED
+            )
+            .annotate(month=TruncMonth("published_at"))
+            .values("month")
+            .annotate(total=Count("id"))
+            .order_by("-month")
+        )
+        archive.append({
+            "year": y["year"].year,
+            "months": months
+        })
 
-    for d in dates:
-        archives[d.year].append(d)
+    return {"archive_menu": archive}
 
-    return {'archive_years': archives}
