@@ -135,15 +135,39 @@ class PostYearArchiveView(YearArchiveView):
     make_object_list = True
     allow_future = False
     template_name = 'blog/post_archive_year.html'
+    paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['year'] = self.kwargs['year']
+        context['title'] = f'Archive Post - {self.kwargs['year']}'
+        return context
 
 class PostMonthArchiveView(MonthArchiveView):
     queryset = Post.objects.filter(status=Post.Status.PUBLISHED)
     date_field = 'published_at'
     allow_future = False
     template_name = 'blog/post_archive_month.html'
+    paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['year'] = self.kwargs['year']
+        context['month'] = self.kwargs['month']
+        context['title'] = f'Archive Post - {self.kwargs['year']}/{self.kwargs['month']}'
+        return context
 
 class PostDayArchiveView(DayArchiveView):
     queryset = Post.objects.filter(status=Post.Status.PUBLISHED)
     date_field = 'published_at'
     allow_future = False
     template_name = 'blog/post_archive_day.html'
+    paginate_by = 2
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['year'] = self.kwargs['year']
+        context['month'] = self.kwargs['month']
+        context['day'] = self.kwargs['day']
+        context['title'] = f'Archive Post - {self.kwargs['year']}/{self.kwargs['month']}/{self.kwargs['day']}'
+        return context

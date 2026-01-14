@@ -20,14 +20,12 @@
 
 <div class="container-fluid">
   <div class="row content">
-    <div class="col-sm-3 sidenav">
+    <div class="col-sm-2 sidenav">
       <h4>My Blog</h4>
       <ul class="nav nav-pills nav-stacked">
-
         <li class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
           <a href="/">Home</a>
         </li>
-
         {% for category in nav_categories %}
           <li class="{% if request.resolver_match.kwargs.category_slug == category.slug %}active{% endif %}">
             <a href="{% url 'blog:category-detail' category.slug %}">
@@ -35,65 +33,50 @@
             </a>
           </li>
         {% endfor %}
-
         <li class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}">
           <a href="/contact/">Contact</a>
         </li>
-
-        <!-- ARCHIVE DROPDOWN -->
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            Archive <span class="caret"></span>
-          </a>
-
-          <ul class="dropdown-menu">
-            {% for y in archive_menu %}
-              <li class="dropdown-submenu">
-                <a href="{% url 'blog:post_archive_year' y.year %}">
-                  {{ y.year }}
-                </a>
-
-                <ul class="dropdown-menu">
-                  {% for m in y.months %}
-                    <li>
-                      <a href="{% url 'blog:post_archive_month' y.year m.month|date:'m' %}">
-                        {{ m.month|date:"F" }}
-                      </a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              </li>
-            {% endfor %}
-          </ul>
-        </li>
-
       </ul>
-
       <br>
       <div class="input-group">
         <form method="get" action="{% url 'blog:post-search' %}" class="d-flex">
-          <div class="row">
-            <div class="col-md-9">
-              <input
-                type="search"
-                name="q"
-                class="form-control me-2"
-                placeholder="Search posts..."
-                value="{{ request.GET.q }}"
-                required
-              >
-            </div>
-            <div class="col-md-3">
-              <button class="btn btn-default" type="submit">Search</button>
-            </div>
-          </div>
+          <input
+            type="search"
+            name="q"
+            class="form-control me-2"
+            placeholder="Search posts..."
+            value="{{ request.GET.q }}"
+            required
+          >
+          <br><br>
+          <button class="btn btn-default" type="submit">Search</button>
         </form>
       </div>
     </div>
 
-    <div class="col-sm-9">
+    <div class="col-sm-8">
       {% block content %}{% endblock content %}
     </div>
+
+    <div class="col-md-2">
+      <h3>Archives</h3>
+      <ul class="nav nav-pills nav-stacked">
+        {% for row in archive_menu %}
+          <li><a href="{% url "blog:post_archive_year" row.years.year|date:'Y'  %}">{{ row.years.year|date:'Y' }} ({{row.years.total}})</a></li>
+          <ul>
+            {% for m in row.months %}
+              <li><a href="{% url "blog:post_archive_month" row.years.year|date:'Y' m.month.month|date:"m" %}">{{ m.month.month|date:"F" }} ({{m.month.total}})</a></li>
+              <ul>
+                {% for d in m.days %}
+                  <li><a href="{% url "blog:post_archive_day" row.years.year|date:'Y' m.month.month|date:"m" d.day|date:'d' %}">{{ d.day|date:'d' }} ({{d.total}})</a></li>
+                {% endfor %}
+              </ul>
+              {% endfor %}
+          </ul>
+        {% endfor %}
+      </ul>
+    </div>
+    
   </div>
 </div>
 

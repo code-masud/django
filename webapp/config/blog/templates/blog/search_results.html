@@ -8,11 +8,11 @@
 <h4><small>SEARCH RESULTS FOR "{{ query }}"</small></h4>
 <hr>
 {% for post in post_list %}
-<h2><a href="{% url "blog:post-detail" category_slug=post.category.slug post_slug=post.slug %}">{{ post.title }}</a></h2>
-<h5><span class="glyphicon glyphicon-time"></span> Post by {{ post.author.username }}, {{ post.created_at|date:"M d, Y"}}.</h5>
+<h2><a href="{% url "blog:post-detail" category_slug=post.category.slug post_slug=post.slug %}">{{ post.title|truncatechars:50 }}</a></h2>
+<h5>Post by {{ post.author.username }}, {{ post.created_at|date:"M d, Y"}}.</h5>
 <h5><span class="label label-danger"><a href="{% url "blog:category-detail" post.category.slug %}">{{ post.category.name }}</a></span></h5><br>
-<p>{{ post.content|truncatechars:150 }}</p>
-<br><br>
+<p>{{ post.content|truncatechars:350 }}</p>
+<br>
 {% empty %}
 <h4><small>NO RESULT FOUND</small></h4>
 {% endfor %}
