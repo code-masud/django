@@ -7,14 +7,17 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views.generic.dates import YearArchiveView, MonthArchiveView, DayArchiveView
+from django.db.models import Prefetch
 
 # Create your views here.
 class PostListView(ListView):
     model = Post
-    queryset = Post.objects.filter(status='P', featured=True)
     context_object_name = 'post_list'
     template_name = 'blog/home.html'
     paginate_by = 2
+
+    def get_queryset(self):
+        return Post.objects.filter(status='P', featured=True).select_related('category', 'author')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -25,9 +28,11 @@ class PostDetailView(DetailView):
     model = Post
     slug_field = 'slug'
     slug_url_kwarg = 'post_slug'
-    queryset = Post.objects.filter(status='P')
     context_object_name = 'post'
     template_name = 'blog/post_detail.html'
+
+    def get_queryset(self):
+        return Post.objects.filter(status='P').select_related('category', 'author').prefetch_related('comments')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -39,10 +44,17 @@ class CategoryDetailView(DetailView):
     model = Category
     slug_field = 'slug'
     slug_url_kwarg = 'category_slug'
-    queryset = Category.objects.filter(published=True)
     context_object_name = 'category'
     template_name = 'blog/category_detail.html'
     paginate_by = 2
+
+    def get_queryset(self):
+        return Category.objects.filter(published=True).prefetch_related(
+                Prefetch(
+                    'posts',
+                    queryset=Post.objects.select_related('category', 'author')
+                )
+            )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

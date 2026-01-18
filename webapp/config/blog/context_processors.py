@@ -15,6 +15,7 @@ def archive_menu(request):
     years = (
         Post.objects
         .filter(status=Post.Status.PUBLISHED)
+        .select_related('category', 'author')
         .annotate(year=TruncYear('published_at'))
         .values('year')
         .annotate(total=Count('id'))
@@ -27,6 +28,7 @@ def archive_menu(request):
         months = (
             Post.objects
             .filter(status=Post.Status.PUBLISHED, published_at__year=y['year'].year)
+            .select_related('category', 'author')
             .annotate(month=TruncMonth('published_at'))
             .values('month')
             .annotate(total=Count('id'))
@@ -41,6 +43,7 @@ def archive_menu(request):
                     published_at__year=y['year'].year,
                     published_at__month=m['month'].month
                 )
+                .select_related('category', 'author')
                 .annotate(day=TruncDay('published_at'))
                 .values('day')
                 .annotate(total=Count('id'))
